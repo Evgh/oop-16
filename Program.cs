@@ -113,7 +113,7 @@ namespace oop_16
 
         static void Main(string[] args)
         {
-            Task<int[]> task1 = new Task<int[]>(() => Eratosthenes(1000000000));
+            Task<int[]> task1 = new Task<int[]>(() => Eratosthenes(100000000));
             Stopwatch stopwatch = new Stopwatch();
 
             stopwatch.Start();
@@ -122,6 +122,7 @@ namespace oop_16
             {
                 Console.WriteLine($"Выполняется таск1 | {task1.Status}");
             }
+            task1.Wait();
             stopwatch.Stop();
             TimeSpan timeSpan = stopwatch.Elapsed;
             string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, timeSpan.Milliseconds / 10);
@@ -136,21 +137,67 @@ namespace oop_16
 
             stopwatch.Restart();
             task2.Start();
-            Console.WriteLine("Введите Y для отмены операции или другой символ для ее продолжения:");
-            
+            Console.WriteLine("Введите Y для отмены операции или другой символ для ее продолжения:");            
             if (Console.ReadLine() == "Y")
             {
                 cancellationTokenSource.Cancel();
             }
-
+            task2.Wait();
             stopwatch.Stop();
             timeSpan = stopwatch.Elapsed;
             elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, timeSpan.Milliseconds / 10);
             Console.WriteLine("Отсортировали за " + elapsedTime + " - " + task1.Status);
             Console.WriteLine();
-   
+
             // 
 
+            Task<int> task3 = new Task<int>(() => { var rr = new Random(); return rr.Next(3, 15); });
+            task3.Start();
+
+            Task<int[][]> task4 = new Task<int[][]>(() => { if (task2.Result == null)
+                                                                return null;        
+
+                                                            int[][] arr = new int[task3.Result][];
+                                                            for (int i = 0; i < arr.Length; i++) 
+                                                            {
+                                                                arr[i] = new int[task3.Result];
+                                                            }    
+                                                            for (int i = 0; i < arr.Length; i++) 
+                                                            {
+                                                                for (int j = 0; j < arr[i].Length; j++) 
+                                                                {
+                                                                    arr[i][j] = task1.Result[i]+task2.Result[j];
+                                                                }               
+                                                                
+                                                            }    
+                                                            return arr;
+                                                          });
+            task4.Start();
+            task4.Wait();
+
+            if (task4.Result != null)
+            {
+                foreach (int[] a in task4.Result)
+                {
+                    foreach (int b in a)
+                    {
+                        Console.Write($"{b} ");
+                    }
+                    Console.WriteLine();
+                }
+
+            }
+
+            //
+
+            Task fifth = new Task(() => Console.WriteLine("O HI Mark"));
+            Task sixth = new Task(() => Console.WriteLine("Anyway"));
+            Task seventh = sixth.ContinueWith((t) => { Console.WriteLine("How is your"); });
+            Task eighth = new Task(() => Console.WriteLine("Session life"));
+
+            sixth.Start();
+            eighth.GetAwaiter().GetResult();
+            fifth.Start();
 
 
             Console.ReadKey();
