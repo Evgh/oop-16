@@ -255,6 +255,44 @@ namespace oop_16
 
             //
 
+            Parallel.Invoke(
+            () =>
+                {
+                    for (int i = 100000; i < 150000; i++)
+                    {
+                        int result = 1;
+                        for (int ii = 1; ii <= i; ii++)
+                        {
+                            result *= ii;
+                        }
+                    }
+                    Console.WriteLine("Первый все");
+                }, 
+            () =>
+                {
+                    for (int i = 0; i < 50000; i++)
+                    {
+                        int result = 1;
+                        for (int ii = 1; ii <= i; ii++)
+                        {
+                            result *= ii;
+                        }
+                    }
+                    Console.WriteLine("Второй все");
+                }, 
+            () =>
+                {
+                    for (int i = 50000; i < 100000; i++)
+                    {
+                        int result = 1;
+                        for (int ii = 1; ii <= i; ii++)
+                        {
+                            result *= ii;
+                        }
+                    }
+                    Console.WriteLine("Третий всё");
+                });
+
 
             Console.ReadLine();
         }
