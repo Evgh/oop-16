@@ -189,20 +189,18 @@ namespace oop_16
             }
 
             //
-            Task sixth = new Task(() => Console.WriteLine("Anyway"));
-            Task seventh = new Task(() => Console.WriteLine("O HI Mark"));
-            Task eighth = new Task(() => Console.WriteLine("Session life"));
-            Task fifth = sixth.ContinueWith((t) => { Console.WriteLine("How is your"); });
 
+            Task fifth = new Task(() => Console.WriteLine("O HI Mark"));
+            Task sixth = new Task(() => Console.WriteLine("Anyway"));
+            Task seventh = sixth.ContinueWith((t) => { Console.WriteLine("How is your"); });
+            Task eighth = new Task(() => Console.WriteLine("Session life"));
 
             sixth.Start();
-            seventh.Start();
-            seventh.GetAwaiter().GetResult();
             eighth.Start();
             eighth.GetAwaiter().GetResult();
+            fifth.Start();
 
 
-            // 
             Console.ReadKey();
         }
     }
