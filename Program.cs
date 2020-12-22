@@ -1,11 +1,10 @@
 ﻿
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Collections.Concurrent;
+
 
 namespace oop_16
 {
@@ -109,6 +108,64 @@ namespace oop_16
                 }
             }
             return numbers;
+        }
+
+
+
+        static BlockingCollection<int> storage;
+
+        public class Producer
+        {
+            public Producer(int i)
+            {
+                Thread myThread = new Thread(produce);
+                myThread.Name = $"Producer {i}";
+                myThread.Start();
+            }
+            static void produce()
+            {
+                for (int i = int.Parse(Thread.CurrentThread.Name.Substring(9)); i < 10 + int.Parse(Thread.CurrentThread.Name.Substring(9)); i++)
+                {
+                    storage.Add(i);
+                    Console.WriteLine("Завезён товар " + i);
+                    Thread.Sleep(100);
+                }
+                if (Thread.CurrentThread.Name.Equals("Producer 5"))
+                    storage.CompleteAdding();
+            }
+        }
+
+        public class Consumer
+        {
+            public Consumer(int i)
+            {
+                Thread myThread = new Thread(consume);
+                myThread.Name = $"Consumer {i}";
+                myThread.Start();
+            }
+            static void consume()
+            {
+                int i;
+                while (!storage.IsCompleted)
+                {
+                    if (storage.TryTake(out i))
+                        Console.WriteLine("Куплен товар " + i);
+                }
+            }
+        }
+        async static void FactorialAsync()
+        {
+            await Task.Run(() => {
+
+                for (int i = 0; i < 50000; i++)
+                {
+                    int result = 1;
+                    for (int ii = 1; ii <= i; ii++)
+                    {
+                        result *= ii;
+                    }
+                }
+            });
         }
 
         static void Main(string[] args)
@@ -293,6 +350,20 @@ namespace oop_16
                     Console.WriteLine("Третий всё");
                 });
 
+            // 
+
+            storage = new BlockingCollection<int>(5);
+            for (int i = 1; i < 11; i++)
+            {
+                Consumer consumer = new Consumer(i);
+            }
+            for (int i = 1; i < 6; i++)
+            {
+                Producer producer = new Producer(i);
+            }
+
+
+            FactorialAsync();
 
             Console.ReadLine();
         }
