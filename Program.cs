@@ -200,8 +200,63 @@ namespace oop_16
             eighth.GetAwaiter().GetResult();
             fifth.Start();
 
+            //
 
-            Console.ReadKey();
+            int[] arrStraight = new int[100000000];
+            stopwatch.Restart();
+            for(int i = 0; i < arrStraight.Length; i++)
+            {
+                arrStraight[i] = i/task3.Result + 42; 
+            }
+            stopwatch.Stop();
+            timeSpan = stopwatch.Elapsed;
+            string time1 = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, timeSpan.Milliseconds / 10);
+
+
+            stopwatch.Restart();
+            int[] arrParallel = new int[100000000];
+            Parallel.For(0, task3.Result, (i) =>
+                {
+                    arrParallel[i] = i / task3.Result + 42;
+                });
+
+            stopwatch.Stop();
+            timeSpan = stopwatch.Elapsed;
+            string time2 = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, timeSpan.Milliseconds / 10);
+
+            Console.WriteLine($"Последовательным циклом for посчитали за {time1}, параллельным за {time2}") ;
+
+            // 
+
+            stopwatch.Restart();
+            foreach(int x in arrParallel)
+            {
+                int buff = x / task3.Result + 42;
+            }
+
+            stopwatch.Stop();
+            timeSpan = stopwatch.Elapsed;
+            time1 = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, timeSpan.Milliseconds / 10);
+
+
+            stopwatch.Restart();
+            Parallel.ForEach(arrParallel, (a) =>
+            {
+                int buff = a / task3.Result + 42; 
+            });
+
+            stopwatch.Stop();
+            timeSpan = stopwatch.Elapsed;
+            time2 = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, timeSpan.Milliseconds / 10);
+
+            Console.WriteLine($"Последовательным циклом foreach посчитали за {time1}, параллельным за {time2}");
+
+            Console.WriteLine();
+
+            //
+
+
+            Console.ReadLine();
         }
     }
 }
